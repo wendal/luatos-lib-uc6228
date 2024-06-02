@@ -32,6 +32,8 @@ function uc6228.start()
                 uart.write(gps_uart_id, "$CFGSYS,H01\r\n")
             elseif opts.sys == 2 then
                 uart.write(gps_uart_id, "$CFGSYS,H10\r\n")
+            elseif opts.sys == 5 then
+                uart.write(gps_uart_id, "$CFGSYS,H101\r\n")
             else
                 uart.write(gps_uart_id, "$CFGSYS,H11\r\n")
             end
@@ -97,11 +99,7 @@ function uc6228.start()
     end
 end
 
-function uc6228.writeCmd(cmd, full)
-    if not full then
-        local ck = crypto.checksum(cmd)
-        cmd = string.format("$%s*%02X\r\n", cmd, ck)
-    end
+function uc6228.writeCmd(cmd)
     log.info("uc6228", "写入指令", cmd:trim())
     uart.write(uc6228.opts.uart_id, cmd)
 end
