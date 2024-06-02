@@ -2,7 +2,9 @@
 
 ]]
 
-local uc6228 = {}
+local uc6228 = {
+    version = "1.0.1"
+}
 
 local sys = require("sys")
 
