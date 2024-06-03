@@ -139,6 +139,11 @@ local function do_agps()
         lat, lng = lbsLoc2.request(5000)
         -- local lat, lng, t = lbsLoc2.request(5000, "bs.openluat.com")
         log.info("lbsLoc2", lat, lng)
+        if lat and lng then
+            lat = tonumber(lat)
+            lng = tonumber(lng)
+            log.info("lbsLoc2", lat, lng)
+        end
     elseif wlan then
         -- wlan.scan()
         -- sys.waitUntil("WLAN_SCAN_DONE", 5000)
@@ -199,6 +204,7 @@ local function do_agps()
     -- "lat":23.4068813,"min":27,"valid":true,"day":27,"lng":113.2317505
     if not lat or not lng then
         -- lat, lng = 23.4068813, 113.2317505
+        log.info("uc6228", "没有GPS坐标", lat, lng)
         return -- TODO 暂时不写入参考位置
     end
     if socket.sntp then
