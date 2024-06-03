@@ -201,12 +201,24 @@ local function do_agps()
         -- lat, lng = 23.4068813, 113.2317505
         return -- TODO 暂时不写入参考位置
     end
-    -- socket.sntp()
-    -- sys.waitUntil("NTP_UPDATE", 1000)
-    -- local dt = os.date("!*t")
-    -- local lla = {lat=lat, lng=lng}
-    -- local aid = libgnss.casic_aid(dt, lla)
-    -- uart.write(gps_uart_id, aid.."\r\n")
+    if socket.sntp then
+        socket.sntp()
+        sys.waitUntil("NTP_UPDATE", 1000)
+    end
+    local date = os.date("!*t")
+    if date.year > 2023 then
+        local str = string.format("$AIDTIME,%d,%d,%d,%d,%d,%d,000", date["year"], date["month"], date["day"],
+            date["hour"], date["min"], date["sec"])
+        log.info("uc6228", "参考时间", str)
+        uart.write(gps_uart_id, str .. "\r\n")
+        sys.wait(20)
+    end
+
+    local str = string.format("$AIDPOS,%.7f,%s,%.7f,%s,1.0\r\n",
+    lat > 0 and lat or (0 - lat), lat > 0 and 'N' or 'S',
+    lng > 0 and lng or (0 - lng), lng > 0 and 'E' or 'W')
+    log.info("uc6228", "写入AGPS参考位置", str)
+    uart.write(gps_uart_id, str)
 
     -- 结束
     uc6228.agps_tm = now
