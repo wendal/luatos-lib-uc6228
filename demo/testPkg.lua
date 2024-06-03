@@ -7,6 +7,7 @@ xmodem = require("xmodem")
 local uc6228 = require("uc6228")
 
 local gps_uart_id = 15
+-- local gps_uart_id = 2
 
 sys.taskInit(function()
     uart.setup(gps_uart_id, 115200)
@@ -14,6 +15,7 @@ sys.taskInit(function()
         sys.publish("uart_rx")
     end)
     local got = false
+    pm.power(pm.GPS, true)
     while got == false do
         uart.write(gps_uart_id, "M!T")
         sys.waitUntil("uart_tx", 8)
@@ -46,14 +48,21 @@ sys.taskInit(function()
         log.info("超时了")
         return
     end
-    
+    sys.wait(1000)
     log.info("发送bootloader")
     xmodem.send(gps_uart_id, 115200, "/luadb/BL115200.pkg", false)
-    sys.wait(200)
+    sys.wait(1000)
+    -- xmodem.send(gps_uart_id, 115200, "/luadb/BL115200.pkg", false)
+    sys.wait(1000)
     log.info("发送固件")
     xmodem.send(gps_uart_id, 115200, "/luadb/r350.pkg", false)
     sys.wait(200)
+    -- xmodem.send(gps_uart_id, 115200, "/luadb/r350.pkg", false)
+    -- sys.wait(200)
     xmodem.close(gps_uart_id)
     sys.wait(500)
     require "testGnss"
+
+    log.info("测试结束")
+    -- os.exit()
 end)
